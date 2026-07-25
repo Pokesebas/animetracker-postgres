@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeTracker</title>
+    <link rel="stylesheet" href="indexc.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="container">
+            <h1>AnimeTracker</h1>
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Correo electrónico" required>
+                <input type="password" id="login-password" placeholder="Contraseña" required>
+                <button type="submit">Ingresar</button>
+            </form>
+            <p>¿No tienes cuenta? 
+                <strong onclick="showRegister()" style="color:#ff99dd; cursor:pointer;">Regístrate</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- Register Screen -->
+    <div id="register-screen" class="screen">
+        <div class="container">
+            <h1>AnimeTracker</h1>
+            <h2>Crear Cuenta</h2>
+            <form id="register-form">
+                <input type="text" id="reg-name" placeholder="Tu nombre" required>
+                <input type="email" id="reg-email" placeholder="Correo electrónico" required>
+                <input type="password" id="reg-password" placeholder="Contraseña" required>
+                <button type="submit">Registrarse</button>
+            </form>
+            <p>¿Ya tienes cuenta? 
+                <strong onclick="showLogin()" style="color:#ff99dd; cursor:pointer;">Inicia sesión</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard-screen" class="screen">
+        <header>
+            <h1>AnimeTracker</h1>
+            <nav class="nav-buttons">
+                <button onclick="showListasModal()">📋 Listas</button>
+                <button onclick="showEstadosModal()">🎬 Estados</button>
+                <button onclick="showAccount()">👤 Cuenta</button>
+                <button onclick="showConfigModal()">⚙️ Configuración</button>
+                <button onclick="showAboutModal()">❓ Quiénes somos</button>
+                <button onclick="logout()" class="btn-salir">Salir</button>
+            </nav>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Buscar anime..." onkeyup="filterAnimes()">
+            <button onclick="showAddModal()">+ Añadir</button>
+            <button id="edit-toggle-btn" onclick="toggleEditMode()">✏️ Editar</button>
+        </div>
+
+        <div id="active-list-banner" class="active-list-banner" style="display:none;">
+            <span id="active-list-text"></span>
+            <button onclick="clearListFilter()">✕ Quitar filtro</button>
+        </div>
+
+        <div id="active-status-banner" class="active-list-banner" style="display:none;">
+            <span id="active-status-text"></span>
+            <button onclick="clearStatusFilter()">✕ Quitar filtro</button>
+        </div>
+
+        <div class="anime-grid" id="anime-grid"></div>
+    </div>
+
+    <!-- Modal Anime (Añadir / Editar) -->
+    <div id="anime-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">×</span>
+            <h2 id="modal-title">Nuevo Anime</h2>
+            <form id="anime-form">
+                <input type="hidden" id="edit-index">
+
+                <input type="text" id="title" placeholder="Título del anime" required>
+                <input type="url" id="image" placeholder="URL de la imagen/logo">
+
+                <select id="status">
+                    <option value="Visto">Visto</option>
+                    <option value="En progreso">En progreso</option>
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Abandonado">Abandonado</option>
+                </select>
+
+                <input type="number" id="episodes" placeholder="Episodios vistos" value="0">
+
+                <label class="field-label">Lista</label>
+                <select id="list-select" onchange="handleListSelectChange()"></select>
+
+                <label class="field-label">Categoría</label>
+                <select id="category">
+                    <option value="Acción">Acción</option>
+                    <option value="Aventura">Aventura</option>
+                    <option value="Comedia">Comedia</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Fantasía">Fantasía</option>
+                    <option value="Terror">Terror</option>
+                    <option value="Misterio">Misterio</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Ciencia Ficción">Ciencia Ficción</option>
+                    <option value="Deportes">Deportes</option>
+                    <option value="Slice of Life">Slice of Life</option>
+                    <option value="Otro">Otro</option>
+                </select>
+
+                <label class="field-label">Temporada</label>
+                <select id="season">
+                    <option value="1">Temporada 1</option>
+                    <option value="2">Temporada 2</option>
+                    <option value="3">Temporada 3</option>
+                    <option value="4">Temporada 4</option>
+                    <option value="5">Temporada 5</option>
+                    <option value="6">Temporada 6</option>
+                    <option value="7">Temporada 7</option>
+                    <option value="8">Temporada 8</option>
+                    <option value="9">Temporada 9</option>
+                    <option value="10">Temporada 10</option>
+                </select>
+
+                <textarea id="notes" placeholder="Notas..."></textarea>
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Cuenta -->
+    <div id="account-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAccountModal()">×</span>
+            <h2>Mi Cuenta</h2>
+            <div id="account-info"></div>
+        </div>
+    </div>
+
+    <!-- Modal Listas -->
+    <div id="listas-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeListasModal()">×</span>
+            <h2>Mis Listas</h2>
+            <div id="listas-info"></div>
+            <button onclick="crearNuevaLista()">+ Crear nueva lista</button>
+        </div>
+    </div>
+
+    <!-- Modal Estados -->
+    <div id="estados-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEstadosModal()">×</span>
+            <h2>Filtrar por Estado</h2>
+            <div id="estados-info"></div>
+        </div>
+    </div>
+
+    <!-- Modal Configuración -->
+    <div id="config-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeConfigModal()">×</span>
+            <h2>Configuración</h2>
+            <div id="config-info">
+                <p style="margin-bottom:15px; color:#ddd;">Ajustes de tu cuenta y de la aplicación.</p>
+                <button onclick="confirmarBorrarDatos()">🗑️ Borrar todos mis animes</button>
+                <button onclick="closeConfigModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Quiénes somos -->
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAboutModal()">×</span>
+            <h2>Quiénes somos</h2>
+            <p style="color:#ddd; line-height:1.6;">
+                AnimeTracker es una aplicación pensada para llevar el control de los animes
+                que ves, quieres ver o ya terminaste. Organiza tus series por listas,
+                categorías y temporadas, todo desde un solo lugar. Hecho con ❤️ para la
+                comunidad otaku.
+            </p>
+        </div>
+    </div>
+
+    <script src="indexj.js"></script>
+</body>
+</html>

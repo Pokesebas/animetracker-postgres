@@ -1,0 +1,233 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: system-ui, sans-serif;
+    background: linear-gradient(135deg, #2a0055, #550099);
+    color: white;
+    min-height: 100vh;
+}
+
+.screen { display: none; min-height: 100vh; padding: 20px; }
+.screen.active { display: block; }
+
+.container {
+    max-width: 420px;
+    margin: 120px auto;
+    background: rgba(255,255,255,0.1);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px 20px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.nav-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.nav-buttons button {
+    width: auto;
+    margin: 0;
+    padding: 10px 16px;
+    white-space: nowrap;
+}
+
+.nav-buttons .btn-salir {
+    background: rgba(255,255,255,0.15);
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.search-bar input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-bar button {
+    width: auto;
+    white-space: nowrap;
+    padding: 14px 20px;
+}
+
+#edit-toggle-btn.active {
+    background: #66ffcc;
+    color: #1f003d;
+}
+
+.active-list-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.12);
+    padding: 10px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+}
+
+.active-list-banner button {
+    width: auto;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.2);
+}
+
+.anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 18px;
+}
+
+.anime-card {
+    position: relative;
+    background: rgba(255,255,255,0.12);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.anime-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 25px rgba(255, 102, 204, 0.3);
+}
+
+.anime-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.anime-info {
+    padding: 12px;
+}
+
+.anime-info .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.15);
+    color: #ffd6f4;
+}
+
+.card-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    z-index: 5;
+}
+
+.card-actions button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0;
+    border-radius: 50%;
+    font-size: 14px;
+    background: rgba(0,0,0,0.6);
+}
+
+.card-actions .delete-btn {
+    background: rgba(200,0,60,0.75);
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1f003d;
+    padding: 25px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 460px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.field-label {
+    display: block;
+    text-align: left;
+    font-size: 13px;
+    color: #ddaaee;
+    margin: 8px 2px -4px;
+}
+
+input, select, textarea, button {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+input, select, textarea {
+    background: rgba(255,255,255,0.95);
+    color: #222;
+}
+
+button {
+    background: #ff66cc;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close {
+    float: right;
+    font-size: 32px;
+    cursor: pointer;
+    color: #ff99dd;
+}
+
+.lista-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.08);
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.lista-item button {
+    width: auto;
+    padding: 8px 14px;
+    margin: 0 0 0 8px;
+}
+
+.lista-item .lista-actions {
+    display: flex;
+    gap: 6px;
+}
