@@ -20,6 +20,9 @@
             <p>¿No tienes cuenta? 
                 <strong onclick="showRegister()" style="color:#ff99dd; cursor:pointer;">Regístrate</strong>
             </p>
+            <p style="margin-top:10px;">
+                <strong onclick="showForgotModal()" style="color:#ff99dd; cursor:pointer; font-size:14px;">¿Olvidaste tu contraseña?</strong>
+            </p>
         </div>
     </div>
 
@@ -84,6 +87,7 @@
                 <input type="text" id="title" placeholder="Título del anime" required>
                 <input type="url" id="image" placeholder="URL de la imagen/logo">
 
+                <label class="field-label" for="status">Estado</label>
                 <select id="status">
                     <option value="Visto">Visto</option>
                     <option value="En progreso">En progreso</option>
@@ -93,10 +97,10 @@
 
                 <input type="number" id="episodes" placeholder="Episodios vistos" value="0">
 
-                <label class="field-label">Lista</label>
+                <label class="field-label" for="list-select">Lista</label>
                 <select id="list-select" onchange="handleListSelectChange()"></select>
 
-                <label class="field-label">Categoría</label>
+                <label class="field-label" for="category">Categoría</label>
                 <select id="category">
                     <option value="Acción">Acción</option>
                     <option value="Aventura">Aventura</option>
@@ -109,10 +113,17 @@
                     <option value="Ciencia Ficción">Ciencia Ficción</option>
                     <option value="Deportes">Deportes</option>
                     <option value="Slice of Life">Slice of Life</option>
+                    <option value="Isekai">Isekai</option>
+                    <option value="Sobrenatural">Sobrenatural</option>
+                    <option value="Tragedia">Tragedia</option>
+                    <option value="Psicológico">Psicológico</option>
+                    <option value="Crimen">Crimen</option>
+                    <option value="Legal/judicial">Legal/judicial</option>
+                    <option value="Médico">Médico</option>
                     <option value="Otro">Otro</option>
                 </select>
 
-                <label class="field-label">Temporada</label>
+                <label class="field-label" for="season">Temporada</label>
                 <select id="season">
                     <option value="1">Temporada 1</option>
                     <option value="2">Temporada 2</option>
@@ -182,8 +193,22 @@
                 AnimeTracker es una aplicación pensada para llevar el control de los animes
                 que ves, quieres ver o ya terminaste. Organiza tus series por listas,
                 categorías y temporadas, todo desde un solo lugar. Hecho con ❤️ para la
-                comunidad otaku.
+                comunidad otaku. Hecho por NEVYRON
             </p>
+        </div>
+    </div>
+
+    <!-- Modal Olvidé mi contraseña -->
+    <div id="forgot-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeForgotModal()">×</span>
+            <h2>Recuperar contraseña</h2>
+            <p style="color:#ddd; margin-bottom:10px;">Ingresa tu correo y te mandaremos un enlace para crear una contraseña nueva.</p>
+            <form id="forgot-form">
+                <input type="email" id="forgot-email" placeholder="Correo electrónico" required>
+                <button type="submit">Enviar enlace</button>
+            </form>
+            <p id="forgot-message" style="margin-top:10px; color:#ddaaee;"></p>
         </div>
     </div>
 

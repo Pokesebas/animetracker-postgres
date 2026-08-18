@@ -607,5 +607,43 @@ function logout() {
     showLogin();
 }
 
+// ==================== OLVIDÉ MI CONTRASEÑA (nuevo) ====================
+function showForgotModal() {
+    document.getElementById('forgot-message').textContent = '';
+    document.getElementById('forgot-form').reset();
+    document.getElementById('forgot-modal').style.display = 'flex';
+}
+
+function closeForgotModal() {
+    document.getElementById('forgot-modal').style.display = 'none';
+}
+
+document.getElementById('forgot-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById('forgot-email').value.trim();
+    const messageEl = document.getElementById('forgot-message');
+    messageEl.textContent = 'Enviando...';
+
+    try {
+        const res = await fetch(`${API_BASE}/solicitar-recuperacion`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            messageEl.textContent = data.error || 'No se pudo enviar el correo.';
+            return;
+        }
+
+        messageEl.textContent = 'Si ese correo existe, te enviamos un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada (y spam).';
+    } catch (err) {
+        console.error(err);
+        messageEl.textContent = 'No se pudo conectar con el servidor.';
+    }
+});
+
 // ==================== INICIAR ====================
 loadData();

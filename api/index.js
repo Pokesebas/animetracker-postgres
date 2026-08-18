@@ -2,6 +2,8 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs'); // bcryptjs en vez de bcrypt: no necesita compilar nada nativo, ideal para serverless
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { getPool } = require('./db');
 
 const app = express();
@@ -9,6 +11,22 @@ app.use(cors());
 app.use(express.json());
 
 const SALT_ROUNDS = 10;
+
+// ==================== CORREO (recuperación de contraseña) ====================
+// Usa tu cuenta de Gmail + una "Contraseña de aplicación" (no tu contraseña normal)
+let transporter;
+function getTransporter() {
+    if (!transporter) {
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.GMAIL_USER,       // tu correo de Gmail
+                pass: process.env.GMAIL_APP_PASSWORD // la contraseña de aplicación de 16 caracteres
+            }
+        });
+    }
+    return transporter;
+}
 
 // ==================== AUTH ====================
 
@@ -64,6 +82,96 @@ app.post('/api/login', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Error al iniciar sesión' });
+    }
+});
+
+// ==================== RECUPERACIÓN DE CONTRASEÑA (nuevo) ====================
+
+// Paso 1: el usuario pide recuperar su contraseña con su correo
+app.post('/api/solicitar-recuperacion', async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ error: 'El correo es obligatorio' });
+    }
+
+    try {
+        const pool = getPool();
+
+        // Genera un token aleatorio y seguro, válido por 30 minutos
+        const token = crypto.randomBytes(32).toString('hex');
+        const expira = new Date(Date.now() + 30 * 60 * 1000); // 30 minutos
+
+        const result = await pool.query(
+            'SELECT * FROM sp_guardar_token_recuperacion($1, $2, $3)',
+            [email, token, expira]
+        );
+
+        // Por seguridad, respondemos "éxito" igual exista o no el correo
+        // (así nadie puede usar este endpoint para adivinar qué correos están registrados)
+        if (result.rows.length === 0) {
+            return res.json({ success: true });
+        }
+
+        const nombre = result.rows[0].nombre;
+        const resetUrl = `${req.headers.origin || 'https://' + req.headers.host}/reset.html?token=${token}`;
+
+        await getTransporter().sendMail({
+            from: `"AnimeTracker" <${process.env.GMAIL_USER}>`,
+            to: email,
+            subject: 'Recupera tu contraseña - AnimeTracker',
+            html: `
+                <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+                    <h2 style="color:#7a1fa2;">AnimeTracker</h2>
+                    <p>Hola ${nombre},</p>
+                    <p>Recibimos una solicitud para restablecer tu contraseña. Haz clic en el siguiente botón para crear una nueva:</p>
+                    <p style="text-align:center; margin: 25px 0;">
+                        <a href="${resetUrl}" style="background:#ff66cc; color:white; padding:14px 24px; border-radius:10px; text-decoration:none; font-weight:bold;">
+                            Restablecer contraseña
+                        </a>
+                    </p>
+                    <p>Este enlace expira en 30 minutos. Si tú no solicitaste esto, puedes ignorar este correo.</p>
+                </div>
+            `
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'No se pudo procesar la solicitud' });
+    }
+});
+
+// Paso 2: el usuario entra al link, escribe su contraseña nueva
+app.post('/api/restablecer-contrasena', async (req, res) => {
+    const { token, password } = req.body;
+    if (!token || !password) {
+        return res.status(400).json({ error: 'Faltan datos' });
+    }
+
+    try {
+        const pool = getPool();
+
+        // Verifica que el token sea válido y no haya expirado
+        const check = await pool.query(
+            'SELECT * FROM sp_obtener_usuario_por_token($1)',
+            [token]
+        );
+
+        if (check.rows.length === 0) {
+            return res.status(400).json({ error: 'El enlace no es válido o ya expiró. Solicita uno nuevo.' });
+        }
+
+        const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+        await pool.query(
+            'SELECT sp_restablecer_contrasena($1, $2)',
+            [token, passwordHash]
+        );
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'No se pudo restablecer la contraseña' });
     }
 });
 
